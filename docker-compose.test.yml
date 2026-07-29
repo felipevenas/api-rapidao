@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  postgres_test:
+    image: postgres:15-alpine
+    container_name: rapidao_postgres_test
+    environment:
+      POSTGRES_USER: test_user
+      POSTGRES_PASSWORD: test_pass
+      POSTGRES_DB: test_db
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test_user -d test_db"]
+      interval: 3s
+      timeout: 3s
+      retries: 5
+
+  redis_test:
+    image: redis:7-alpine
+    container_name: rapidao_redis_test
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 3s
+      retries: 5
+
+  test_runner:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: rapidao_pytest_runner
+    command: pytest -v --tb=short
+    environment:
+      - POSTGRES_SERVER=postgres_test
+      - POSTGRES_USER=test_user
+      - POSTGRES_PASSWORD=test_pass
+      - POSTGRES_DB=test_db
+      - POSTGRES_PORT=5432
+      - REDIS_HOST=redis_test
+      - REDIS_PORT=6379
+      - JWT_SECRET=test_jwt_secret_key
+      - CELERY_BROKER_URL=redis://redis_test:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis_test:6379/0
+    depends_on:
+      postgres_test:
+        condition: service_healthy
+      redis_test:
+        condition: service_healthy

@@ -1,0 +1,147 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: rapidao_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-rapidao_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-rapidao_pass}
+      POSTGRES_DB: ${POSTGRES_DB:-rapidao_db}
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-rapidao_user} -d ${POSTGRES_DB:-rapidao_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - rapidao_net
+
+  redis:
+    image: redis:7-alpine
+    container_name: rapidao_redis
+    restart: always
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - rapidao_net
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: rapidao_api
+    restart: always
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    environment:
+      - POSTGRES_SERVER=postgres
+      - POSTGRES_USER=rapidao_user
+      - POSTGRES_PASSWORD=rapidao_pass
+      - POSTGRES_DB=rapidao_db
+      - POSTGRES_PORT=5432
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - JWT_SECRET=dev_jwt_secret_key_rapidao_2026_change_in_prod
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - rapidao_net
+
+  celery_worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: rapidao_celery_worker
+    restart: always
+    command: celery -A app.worker.core.celery_app.celery_app worker --loglevel=info
+    volumes:
+      - .:/app
+    environment:
+      - POSTGRES_SERVER=postgres
+      - POSTGRES_USER=rapidao_user
+      - POSTGRES_PASSWORD=rapidao_pass
+      - POSTGRES_DB=rapidao_db
+      - POSTGRES_PORT=5432
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - JWT_SECRET=dev_jwt_secret_key_rapidao_2026_change_in_prod
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - rapidao_net
+
+  celery_beat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: rapidao_celery_beat
+    restart: always
+    command: celery -A app.worker.core.celery_app.celery_app beat --loglevel=info
+    volumes:
+      - .:/app
+    environment:
+      - POSTGRES_SERVER=postgres
+      - POSTGRES_USER=rapidao_user
+      - POSTGRES_PASSWORD=rapidao_pass
+      - POSTGRES_DB=rapidao_db
+      - POSTGRES_PORT=5432
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - JWT_SECRET=dev_jwt_secret_key_rapidao_2026_change_in_prod
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - rapidao_net
+
+  pgadmin:
+    image: dpage/pgadmin4:8
+    container_name: rapidao_pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@rapidao.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin123}
+    ports:
+      - "8081:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - rapidao_net
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  rapidao_net:
+    driver: bridge

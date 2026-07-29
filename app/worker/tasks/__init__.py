@@ -1,0 +1,1 @@
+# Tarefas assíncronas do Celery
