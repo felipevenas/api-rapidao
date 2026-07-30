@@ -35,11 +35,12 @@ class Settings(BaseSettings):
             return self.REDIS_CUSTOM_URL
         return f"redis://{self.REDIS_HOST}:{self.REDIS_PORT}/{self.REDIS_DB}"
 
-    # JWT & Segurança
-    JWT_SECRET: str = "dev_jwt_secret_key_rapidao_2026_change_in_prod"
+    # JWT & Segurança (Secret key de 32+ caracteres para conformidade SHA256)
+    JWT_SECRET: str = "rapidao_super_secret_jwt_key_2026_production_safe_key_32bytes"
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24  # 24 Horas
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
+
 
     # Rate Limiting
     RATE_LIMIT_DEFAULT_REQUESTS: int = 60
