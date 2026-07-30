@@ -2,7 +2,26 @@
 
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
+## [0.5.0] - 29-07-2026
+
+### Alterações
+
+#### 🚀 Adicionado
+- **Domínio `notification` (Transactional Outbox Pattern & WebSockets em Tempo Real)**:
+  * Modelagem da entidade `OrderOutbox` (tabela `order_outbox`) garantindo persistência atômica de eventos de pedidos dentro da mesma transação SQL (`order_id`, `event_type`, `payload`, `processed`, `created_at`).
+  * **Gerenciador de WebSockets (`ConnectionManager`) com Redis Pub/Sub**: Suporte a conexões reativas na rota `/ws/orders/{order_id}` para notificar clientes, lojas e entregadores sobre atualizações do pedido em tempo real.
+  * Endpoints REST para consulta do histórico de eventos: `GET /notifications/orders/{order_id}` e `GET /notifications/unprocessed`.
+  * **Tarefas Celery Worker & Beat (`app/worker/tasks/notification_tasks.py`)**:
+    - `process_outbox_events`: Drenagem em lote e transmissão de eventos pendentes para WebSockets/Redis Pub/Sub.
+    - `expire_stale_orders`: Tarefa periódica do Celery Beat para cancelamento automático de pedidos estagnados.
+  * Migração Alembic `b2c3d4e5f6a7_add_order_outbox_table.py` criando a tabela `order_outbox` e índices operacionais.
+- **Suíte de Testes Expandida (`tests/test_notification.py`)**:
+  * Testes cobrindo gravação no Outbox, escuta via `ConnectionManager` de WebSockets, endpoints HTTP de notificações e execução da drenagem. Totalizando 78/78 testes passando com 100% de sucesso.
+
+---
+
 ## [0.4.0] - 29-07-2026
+
 
 ### Alterações
 
