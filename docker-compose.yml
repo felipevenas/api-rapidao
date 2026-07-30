@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:15-alpine
@@ -50,13 +48,13 @@ services:
       - .:/app
     environment:
       - POSTGRES_SERVER=postgres
-      - POSTGRES_USER=rapidao_user
-      - POSTGRES_PASSWORD=rapidao_pass
-      - POSTGRES_DB=rapidao_db
+      - POSTGRES_USER=${POSTGRES_USER:-rapidao_user}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-rapidao_pass}
+      - POSTGRES_DB=${POSTGRES_DB:-rapidao_db}
       - POSTGRES_PORT=5432
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - JWT_SECRET=dev_jwt_secret_key_rapidao_2026_change_in_prod
+      - JWT_SECRET=${JWT_SECRET:-rapidao_super_secret_jwt_key_2026_production_safe_key_32bytes}
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
     depends_on:
@@ -78,13 +76,13 @@ services:
       - .:/app
     environment:
       - POSTGRES_SERVER=postgres
-      - POSTGRES_USER=rapidao_user
-      - POSTGRES_PASSWORD=rapidao_pass
-      - POSTGRES_DB=rapidao_db
+      - POSTGRES_USER=${POSTGRES_USER:-rapidao_user}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-rapidao_pass}
+      - POSTGRES_DB=${POSTGRES_DB:-rapidao_db}
       - POSTGRES_PORT=5432
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - JWT_SECRET=dev_jwt_secret_key_rapidao_2026_change_in_prod
+      - JWT_SECRET=${JWT_SECRET:-rapidao_super_secret_jwt_key_2026_production_safe_key_32bytes}
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
     depends_on:
@@ -106,13 +104,13 @@ services:
       - .:/app
     environment:
       - POSTGRES_SERVER=postgres
-      - POSTGRES_USER=rapidao_user
-      - POSTGRES_PASSWORD=rapidao_pass
-      - POSTGRES_DB=rapidao_db
+      - POSTGRES_USER=${POSTGRES_USER:-rapidao_user}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-rapidao_pass}
+      - POSTGRES_DB=${POSTGRES_DB:-rapidao_db}
       - POSTGRES_PORT=5432
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - JWT_SECRET=dev_jwt_secret_key_rapidao_2026_change_in_prod
+      - JWT_SECRET=${JWT_SECRET:-rapidao_super_secret_jwt_key_2026_production_safe_key_32bytes}
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
     depends_on:
