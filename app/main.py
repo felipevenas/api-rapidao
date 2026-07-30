@@ -19,6 +19,8 @@ from app.domain.product.routes import router as product_router
 from app.domain.user.routes import router as user_router
 from app.domain.freight.routes import router as freight_router
 from app.domain.order.routes import router as order_router
+from app.domain.delivery.routes import router as delivery_router
+
 
 
 @asynccontextmanager
@@ -164,3 +166,6 @@ app.include_router(freight_router, prefix=settings.API_V1_STR)
 app.include_router(freight_router, include_in_schema=False)
 app.include_router(order_router, prefix=settings.API_V1_STR)
 app.include_router(order_router, include_in_schema=False)
+app.include_router(delivery_router, prefix=settings.API_V1_STR)
+app.include_router(delivery_router, include_in_schema=False)
+

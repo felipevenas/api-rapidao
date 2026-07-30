@@ -2,7 +2,23 @@
 
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
+## [0.4.0] - 29-07-2026
+
+### Alterações
+
+#### 🚀 Adicionado
+- **Domínio `delivery` (Gestão & Atribuição Atômica de Entregadores)**:
+  * Modelagem da entidade `Deliverer` (tabela `deliverers`) vinculada com `user_id` (`UserRole.DELIVERER`), rastreando tipo de veículo, geolocalização (`latitude`/`longitude`), disponibilidade (`is_available`), ocupação (`is_busy`) e timestamp do último ping (`last_ping_at`).
+  * **Atribuição Atômica com Trava Pessimista (`SELECT FOR UPDATE`)**: Garantia de integridade contra condições de corrida para selecionar e reservar o entregador disponível mais próximo da loja (calculado via Haversine) sem concorrência de pedidos simultâneos.
+  * Endpoints REST padronizados do ciclo de entrega: `POST /deliverers/profile`, `GET /deliverers/me`, `PATCH /deliverers/me/location` (pings em tempo real), `POST /deliverers/orders/{order_id}/assign`, `POST /deliverers/orders/{order_id}/start` e `POST /deliverers/orders/{order_id}/complete`.
+  * Migração Alembic `a1b2c3d4e5f6_add_deliverers_table.py` criando a tabela `deliverers` e índices com suporte assíncrono.
+- **Suíte de Testes Expandida (`tests/test_delivery.py`)**:
+  * Adicionados 7 novos testes automatizados cobrindo cadastro de entregador, atualização por ping de geolocalização, controle de acesso RBAC, atribuição atômica por proximidade, transição de status para `em_rota`/`entregue` e liberação automática de ocupação (`is_busy = False`). Totalizando 76/76 testes passando com 100% de sucesso.
+
+---
+
 ## [0.3.0] - 29-07-2026
+
 
 ### Alterações
 
