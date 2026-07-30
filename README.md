@@ -26,7 +26,9 @@ A **Rapidão Delivery API** foi desenvolvida como solução de backend para o ec
 - **Cálculo de Frete por Geolocalização**: Cálculo da distância geográfica entre cliente e loja utilizando a **Fórmula de Haversine** e precificação dinâmica. Resultados de distância são mantidos em cache Redis (`distance:{lat1}:{lng1}:{lat2}:{lng2}`) com TTL de 10 minutos para alta performance.
 - **Máquina de Estados Estrita para Pedidos**: Controle rigoroso das transições de status (`pendente -> em_preparo -> em_rota -> entregue` / `cancelado`), garantindo snapshots de preços dos produtos e validação de permissão de cada ator no fluxo.
 - **Atribuição Atômica de Entregador**: Seleção e reserva do entregador disponível mais próximo da loja via trava pessimista SQL (`SELECT FOR UPDATE`) para evitar condições de corrida em atribuições concorrentes.
-- **Tarefas Assíncronas com Celery & Redis**: Worker assíncrono para tarefas de background (como cancelamento periódico de pedidos antigos parados via Celery Beat) e enfileiramento resiliente.
+- **Transactional Outbox & WebSockets**: Padrão Outbox (`order_outbox`) garantindo notificação assíncrona confiável e canal WebSocket (`/ws/orders/{order_id}`) com Redis Pub/Sub para escuta em tempo real.
+- **Tarefas Assíncronas com Celery & Redis**: Worker assíncrono para tarefas de background (como drenagem de outbox e cancelamento periódico de pedidos antigos parados via Celery Beat).
+
 
 - **Observabilidade Estruturada**: Logger com injeção automática de `correlation_id` (requisições HTTP FastAPI) e `task_id` (tarefas Celery) via ContextVars assíncronos.
 - **Script Utilitário de DX**: Inclui um script centralizador `run.py` para controlar todas as ações do ecossistema Docker Compose, migrações Alembic e suíte de testes com um único comando.
@@ -56,7 +58,9 @@ api-rapidao/
 │   │   ├── product/              # Gestão de Produtos do Cardápio
 │   │   ├── freight/              # Serviço de cálculo de frete por Haversine + Redis
 │   │   ├── order/                # Pedidos, itens e Máquina de Estados Estrita
-│   │   └── delivery/             # Perfil, pings de geolocalização e Atribuição Atômica (FOR UPDATE)
+│   │   ├── delivery/             # Perfil, pings de geolocalização e Atribuição Atômica (FOR UPDATE)
+│   │   └── notification/         # Outbox Pattern, WebSockets (Pub/Sub Redis) e Histórico de Notificações
+
 
 │   ├── worker/                   # Tarefas em segundo plano do Celery Worker/Beat
 │   └── main.py                   # Ponto de entrada do FastAPI, Middlewares e Handlers
