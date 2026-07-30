@@ -18,6 +18,8 @@ import app.domain.user.models   # noqa: F401
 import app.domain.store.models  # noqa: F401
 import app.domain.product.models # noqa: F401
 import app.domain.order.models   # noqa: F401
+import app.domain.delivery.models # noqa: F401
+
 
 config = context.config
 
