@@ -1,36 +1,55 @@
-# Descrição do Pull Request
+# Pull Request
 
-Por favor, inclua um resumo das alterações feitas e quais problemas ou funcionalidades foram abordados.
+## Description
 
----
+Provide a clear summary of the change and the problem or feature it addresses.
 
-## Tipo de Alteração
+- Related issue:
+- Domain(s) affected:
 
-- [ ] 🚀 Nova funcionalidade (feature)
-- [ ] 🐞 Correção de bug (bug fix)
-- [ ] 🔧 Refatoração de código (sem alteração de funcionalidade)
-- [ ] 📝 Documentação (docs)
-- [ ] 🎨 Estilo / Design / Logs (logs, formatação, etc.)
-- [ ] ⚙️ Ajuste de infraestrutura (Docker, CI/CD, dependências, etc.)
+## Type of change
 
-## Como foi testado?
+- [ ] 🚀 New feature (`feat`)
+- [ ] 🐞 Bug fix (`fix`)
+- [ ] 🔧 Refactor (no behavior change)
+- [ ] 📝 Documentation (`docs`)
+- [ ] 🎨 Style / formatting / log wording
+- [ ] ⚙️ Infrastructure, Docker, dependencies, or tooling (`chore`)
 
-Por favor, descreva os testes executados para verificar suas alterações e como reproduzi-los.
+## How was it tested?
 
-- [ ] **Testes de Unidade/Integração:** Rodou `pytest` localmente e todos os testes passaram (77/77 testes).
-- [ ] **Stack Docker Compose:** Subiu os containers via `python run.py start` ou `docker-compose up -d` e os serviços (`app`, `celery_worker`, `celery_beat`, `postgres`, `redis`) estão saudáveis.
-- [ ] **Logs de Diagnóstico:** Verificou os logs com `python run.py logs` e não há exceptions de banco ou autenticação.
-- [ ] **Alembic Migrations:** Gerada e testada nova migração de banco via `alembic upgrade head` (se aplicável).
-- [ ] Outros testes executados:
+Describe the tests and checks you ran, and how a reviewer can reproduce them.
 
-## Evidência Visual / Logs
+- [ ] **Test suite:** `pytest -q` passes locally.
+- [ ] **Docker stack:** `python run.py start` (or `docker-compose up -d`) brings up `app`, `postgres`, `redis`, `celery_worker`, and `celery_beat` healthy.
+- [ ] **Logs:** `python run.py logs` shows no database, authentication, or unhandled exceptions.
+- [ ] **Migrations:** a new Alembic revision was generated and tested with `alembic upgrade head` (if applicable).
+- [ ] **RBAC:** authorized and unauthorized paths were exercised.
+- [ ] **Order state machine:** allowed and denied transitions were exercised (if applicable).
+- [ ] Other:
 
-*Se aplicável, cole capturas do terminal, logs significativos de sucesso ou capturas de tela do Swagger/pgAdmin.*
+## Visual evidence / logs
+
+If applicable, paste terminal output, structured log lines, or Swagger/pgAdmin screenshots. Redact tokens, passwords, and personal data.
 
 ## Checklist
 
-- [ ] Meu código segue as diretrizes de estilo do projeto.
-- [ ] Eu fiz uma auto-revisão do meu próprio código.
-- [ ] Comentei partes do meu código que podem ser complexas ou difíceis de entender.
-- [ ] Atualizei o arquivo `CHANGELOG.md` com as minhas modificações na versão correspondente.
-- [ ] Minhas alterações não geraram novos warnings ou erros nos logs do Docker.
+- [ ] My code follows the project's layered architecture (`routes → usecase → service → repository → model`).
+- [ ] Business rules live in the service or use case layer, not in the route.
+- [ ] I changed the order state machine or RBAC only with matching tests.
+- [ ] I performed a self-review of my own diff.
+- [ ] I commented on complex or non-obvious parts.
+- [ ] I updated `CHANGELOG.md` under `[Unreleased]` for user-visible changes.
+- [ ] I added or updated tests for the new behavior.
+- [ ] Model changes include an Alembic migration; existing migrations were not edited.
+- [ ] My changes did not introduce new warnings or errors in the Docker logs.
+- [ ] No secrets, credentials, tokens, or personal data are included in this pull request.
+
+## Breaking change?
+
+- [ ] Yes — describe the impact and migration path below.
+- [ ] No
+
+## Additional notes
+
+Add anything else the reviewer should know.
